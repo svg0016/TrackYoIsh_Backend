@@ -71,6 +71,7 @@ app.post("/signup", (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { password, email } = req.body;
+  console.log(`password: ${password} email: ${email}`);
   let data = await login(email, password);
   let { token, cookie, userId } = data;
   if (cookie) {
