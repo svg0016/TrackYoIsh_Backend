@@ -46,15 +46,15 @@ app.post("/signup", (req, res) => {
 
     newUser.save((err, savedUser) => {
       if (err) {
-        res.send({ error: err });
+        res.send({ ok: false, message: "Could not save user" });
       } else {
-        res.send(savedUser);
+        res.send({ ok: true, user: savedUser });
       }
     });
   });
 });
 
-app.get("/login", async (req, res) => {
+app.post("/login", async (req, res) => {
   const { password, email } = req.body;
   let data = await login(email, password);
   let { token, cookie } = data;
@@ -112,11 +112,11 @@ app.post("/refresh_token", async (req, res) => {
 
 app.get("/trackingnumber", async (req, res) => {
   const tracker = new api.Tracker({
-    tracking_code: "EZ4000000004",
-    carrier: "UPS",
+    tracking_code: "92055901755477000326971082",
+    carrier: "USPS",
   });
 
-  tracker.save().then(console.log);
+  tracker.save().then((data) => res.send(data));
 });
 
 app.get("/getall", (req, res) => {
