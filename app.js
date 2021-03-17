@@ -76,7 +76,7 @@ app.post("/login", async (req, res) => {
   let { token, cookie, userId } = data;
   if (cookie) {
     res.cookie(cookie.cookieId, cookie.refreshToken);
-    res.send({ accessToken: token.accessToken, userId });
+    res.send({ accessToken: token.accessToken, userId, ok: true });
   } else {
     res.send(data);
   }
@@ -99,7 +99,6 @@ const login = async (email, password) => {
     };
     let token = {
       accessToken: createAccessToken(user),
-      ok: true,
     };
 
     data = { token, cookie, userId: user.id };
