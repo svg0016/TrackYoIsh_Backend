@@ -6,7 +6,7 @@ const UserProfile = new Schema({
   lastname: String,
   email: String,
   password: String,
-  trackingnumbers: [String],
+  trackingnumbers: [{ number: String, carrier: String }],
 });
 
 module.exports = mongoose.model("Users", UserProfile);

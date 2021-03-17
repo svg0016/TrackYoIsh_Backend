@@ -15,6 +15,12 @@ const api = new Easypost(process.env.EASYPOST_API);
 const connectionString =
   "mongodb+srv://treyv:test123@cluster0.chs8q." +
   "mongodb.net/TrackYoIsh?retryWrites=true&w=majority";
+const protectedPaths = {
+  getTrackingData: "/trackingnumber/:trackingNumber/:carrier",
+  getAllTrackingData: "/getall/:userId",
+  insertTrackingData: "/trackingnumber",
+  deleteTrackingData: "/trackingnumber",
+};
 mongoose.connect(
   connectionString,
   { useNewUrlParser: true },
@@ -27,7 +33,15 @@ app.use(cookieParser());
 app.use(isAuth);
 app.use(cors());
 app.use(express.json());
-// app.options("*", cors());
+
+Object.values(protectedPaths).forEach((path) => {
+  app.use(path, (req, res, next) => {
+    if (!authCheck(req)) {
+      return res.send({ ok: false, message: "Not authorized." });
+    }
+    next();
+  });
+});
 
 app.post("/signup", (req, res) => {
   const { firstname, lastname, email, password } = req.body;
@@ -57,10 +71,10 @@ app.post("/signup", (req, res) => {
 app.post("/login", async (req, res) => {
   const { password, email } = req.body;
   let data = await login(email, password);
-  let { token, cookie } = data;
+  let { token, cookie, userId } = data;
   if (cookie) {
     res.cookie(cookie.cookieId, cookie.refreshToken);
-    res.send(token);
+    res.send({ accessToken: token.accessToken, userId });
   } else {
     res.send(data);
   }
@@ -86,19 +100,18 @@ const login = async (email, password) => {
       ok: true,
     };
 
-    data = { token, cookie };
+    data = { token, cookie, userId: user.id };
   }
   return data;
 };
 
-app.post("/refresh_token", async (req, res) => {
+app.post("/refresh-token", async (req, res) => {
   let { userId } = req.body;
   const token = req.cookies.jid;
   if (!token) {
     return res.send({ ok: false, accessToken: "" });
   }
   let payload;
-  console.log(token);
 
   payload = verify(token, process.env.REFRESH_TOKEN_SECRET);
 
@@ -106,35 +119,43 @@ app.post("/refresh_token", async (req, res) => {
   if (!user) {
     return res.send({ ok: false, accessToken: "" });
   } else {
-    res.send({ ok: true, accessToken: createAccessToken(user) });
+    res.send({
+      ok: true,
+      userId: user.id,
+      accessToken: createAccessToken(user),
+    });
   }
 });
 
-app.get("/trackingnumber", async (req, res) => {
+app.get(protectedPaths.getTrackingData, async (req, res) => {
+  let { trackingNumber, carrier } = req.params;
   const tracker = new api.Tracker({
-    tracking_code: "92055901755477000326971082",
-    carrier: "USPS",
+    tracking_code: trackingNumber,
+    carrier: carrier,
   });
 
-  tracker.save().then((data) => res.send(data));
+  tracker
+    .save()
+    .then((data) => res.send({ ok: true, data }))
+    .catch((err) => res.send({ ok: false, message: err.error }));
 });
 
-app.get("/getall", (req, res) => {
-  let { userId } = req.body;
+app.get(protectedPaths.getAllTrackingData, (req, res) => {
+  let { userId } = req.params;
   User.findOne({ _id: userId }, (err, doc) => {
     if (err) {
-      res.send({ ok: false });
+      res.send({ ok: false, message: "Unable to find user." });
     } else {
-      res.send({ ok: true, data: doc.trackingnumbers });
+      res.send({ ok: true, trackingNumbers: doc.trackingnumbers });
     }
   });
 });
 
-app.put("/trackingnumber", (req, res) => {
-  let { userId, trackingNumber } = req.body;
+app.put(protectedPaths.insertTrackingData, (req, res) => {
+  let { userId, trackingNumber, carrier } = req.body;
   User.updateOne(
     { _id: userId },
-    { $push: { trackingnumbers: trackingNumber } },
+    { $push: { trackingnumbers: { number: trackingNumber, carrier } } },
     (err, doc) => {
       if (err) {
         res.send({ ok: false });
@@ -145,14 +166,14 @@ app.put("/trackingnumber", (req, res) => {
   );
 });
 
-app.delete("/trackingnumber", (req, res) => {
+app.delete(protectedPaths.deleteTrackingData, (req, res) => {
   let { trackingNumber, userId } = req.body;
   User.updateOne(
     { _id: userId },
-    { $pull: { trackingnumbers: trackingNumber } },
+    { $pull: { trackingnumbers: { number: trackingNumber } } },
     (err, doc) => {
       if (err) {
-        res.send({ ok: false });
+        res.send({ ok: false, err });
       } else {
         res.send({ ok: true });
       }
