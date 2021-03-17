@@ -33,6 +33,7 @@ app.use(cookieParser());
 app.use(isAuth);
 app.use(cors());
 app.use(express.json());
+app.options("*", cors());
 
 Object.values(protectedPaths).forEach((path) => {
   app.use(path, (req, res, next) => {
