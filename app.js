@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.use(isAuth);
 app.use(cors());
 app.use(express.json());
-// app.options("*", cors());
+app.options("*", cors());
 
 Object.values(protectedPaths).forEach((path) => {
   app.use(path, (req, res, next) => {
@@ -45,7 +45,6 @@ Object.values(protectedPaths).forEach((path) => {
 });
 
 app.post("/signup", (req, res) => {
-  console.log("blue");
   const { firstname, lastname, email, password } = req.body;
   bcrypt.hash(password, 10, (err, hash) => {
     if (err) {
