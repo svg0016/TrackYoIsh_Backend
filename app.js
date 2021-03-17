@@ -45,6 +45,7 @@ Object.values(protectedPaths).forEach((path) => {
 });
 
 app.post("/signup", (req, res) => {
+  console.log("blue");
   const { firstname, lastname, email, password } = req.body;
   bcrypt.hash(password, 10, (err, hash) => {
     if (err) {
