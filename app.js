@@ -123,6 +123,7 @@ app.post("/refresh-token", async (req, res) => {
   res.header("Access-Control-Allow-Credentials", true);
   let { userId } = req.body;
   const token = req.cookies.jid;
+  console.log(token);
   if (!token) {
     return res.send({ ok: false, accessToken: "" });
   }
