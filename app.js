@@ -118,6 +118,8 @@ const login = async (email, password) => {
 };
 
 app.post("/refresh-token", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:5501");
+  res.header("Access-Control-Allow-Credentials", true);
   let { userId } = req.body;
   const token = req.cookies.jid;
   if (!token) {
