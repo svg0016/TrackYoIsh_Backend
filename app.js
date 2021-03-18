@@ -26,12 +26,23 @@ mongoose.connect(
   { useNewUrlParser: true },
   { useUnifiedTopology: true }
 );
+
+const whitelist = ["http://localhost:5501", "http://heroku.com"];
+const corsOptions = {
+  credentials: true, // This is important.
+  origin: (origin, callback) => {
+    if (whitelist.includes(origin)) return callback(null, true);
+    callback(new Error("Not allowed by CORS"));
+  },
+};
+
+app.use(cors(corsOptions));
+
 app.listen(PORT, function () {
   console.log(`Listening on ${PORT}`);
 });
 app.use(cookieParser());
 app.use(isAuth);
-app.use(cors());
 app.use(express.json());
 // app.options("*", cors());
 
