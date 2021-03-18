@@ -27,16 +27,16 @@ mongoose.connect(
   { useUnifiedTopology: true }
 );
 
-const whitelist = ["http://localhost:5501", "http://127.0.0.1:5501"];
-const corsOptions = {
-  credentials: true, // This is important.
-  origin: (origin, callback) => {
-    if (whitelist.includes(origin)) return callback(null, true);
-    callback(new Error("Not allowed by CORS"));
-  },
-};
+// const whitelist = ["https://heroku.com", "https://github.com", "http://localhost"];
+// const corsOptions = {
+//   credentials: true, // This is important.
+//   origin: (origin, callback) => {
+//     if (whitelist.includes(origin)) return callback(null, true);
+//     callback(new Error("Not allowed by CORS"));
+//   },
+// };
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.listen(PORT, function () {
   console.log(`Listening on ${PORT}`);
@@ -81,7 +81,6 @@ app.post("/signup", (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { password, email } = req.body;
-  console.log(`password: ${password} email: ${email}`);
   let data = await login(email, password);
   let { token, cookie, userId } = data;
   if (cookie) {
