@@ -154,6 +154,7 @@ app.get(protectedPaths.getAllTrackingData, (req, res) => {
 
 app.put(protectedPaths.insertTrackingData, (req, res) => {
   let { userId, trackingNumber, carrier } = req.body;
+  console.log(`user: ${userId}. tracking: ${trackingNumber}`);
   User.updateOne(
     { _id: userId },
     { $push: { trackingnumbers: { number: trackingNumber, carrier } } },
