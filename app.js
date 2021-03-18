@@ -45,8 +45,6 @@ app.use(cookieParser());
 app.use(isAuth);
 app.use(express.json());
 
-// app.options("*", cors());
-
 Object.values(protectedPaths).forEach((path) => {
   app.use(path, (req, res, next) => {
     if (!authCheck(req)) {
@@ -119,11 +117,10 @@ const login = async (email, password) => {
 };
 
 app.post("/refresh-token", async (req, res) => {
-  res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5501");
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
   res.header("Access-Control-Allow-Credentials", true);
   let { userId } = req.body;
   const token = req.cookies.jid;
-  console.log(token);
   if (!token) {
     return res.send({ ok: false, accessToken: "" });
   }
