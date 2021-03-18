@@ -29,7 +29,7 @@ mongoose.connect(
 
 const whitelist = [
   "https://heroku.com",
-  "https://github.io",
+  "https://svg0016.github.io",
   "http://localhost",
 ];
 const corsOptions = {
