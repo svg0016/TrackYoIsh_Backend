@@ -27,16 +27,20 @@ mongoose.connect(
   { useUnifiedTopology: true }
 );
 
-// const whitelist = ["https://heroku.com", "https://github.com", "http://localhost"];
-// const corsOptions = {
-//   credentials: true, // This is important.
-//   origin: (origin, callback) => {
-//     if (whitelist.includes(origin)) return callback(null, true);
-//     callback(new Error("Not allowed by CORS"));
-//   },
-// };
+const whitelist = [
+  "https://heroku.com",
+  "https://github.io",
+  "http://localhost",
+];
+const corsOptions = {
+  credentials: true, // This is important.
+  origin: (origin, callback) => {
+    if (whitelist.includes(origin)) return callback(null, true);
+    callback(new Error("Not allowed by CORS"));
+  },
+};
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.listen(PORT, function () {
   console.log(`Listening on ${PORT}`);
