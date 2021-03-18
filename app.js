@@ -44,6 +44,20 @@ app.listen(PORT, function () {
 app.use(cookieParser());
 app.use(isAuth);
 app.use(express.json());
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept"
+  );
+  if ("OPTIONS" == req.method) {
+    res.send(200);
+  } else {
+    next();
+  }
+});
 // app.options("*", cors());
 
 Object.values(protectedPaths).forEach((path) => {
@@ -118,8 +132,6 @@ const login = async (email, password) => {
 };
 
 app.post("/refresh-token", async (req, res) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5501");
-  res.header("Access-Control-Allow-Credentials", true);
   let { userId } = req.body;
   const token = req.cookies.jid;
   if (!token) {
