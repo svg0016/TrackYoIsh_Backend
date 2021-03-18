@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.use(isAuth);
 app.use(cors());
 app.use(express.json());
-app.options("*", cors());
+// app.options("*", cors());
 
 Object.values(protectedPaths).forEach((path) => {
   app.use(path, (req, res, next) => {
@@ -154,7 +154,6 @@ app.get(protectedPaths.getAllTrackingData, (req, res) => {
 
 app.put(protectedPaths.insertTrackingData, (req, res) => {
   let { userId, trackingNumber, carrier } = req.body;
-  console.log(`user: ${userId}. tracking: ${trackingNumber}`);
   User.updateOne(
     { _id: userId },
     { $push: { trackingnumbers: { number: trackingNumber, carrier } } },
