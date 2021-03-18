@@ -121,7 +121,7 @@ const login = async (email, password) => {
   return data;
 };
 
-app.post("/refresh-token", cors(corsOptions), async (req, res) => {
+app.post("/refresh-token", async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
   res.header("Access-Control-Allow-Credentials", true);
   let { userId } = req.body;
