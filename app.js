@@ -15,6 +15,7 @@ const api = new Easypost(process.env.EASYPOST_API);
 const connectionString =
   "mongodb+srv://treyv:test123@cluster0.chs8q." +
   "mongodb.net/TrackYoIsh?retryWrites=true&w=majority";
+
 const protectedPaths = {
   getTrackingData: "/trackingnumber/:trackingNumber/:carrier",
   getAllTrackingData: "/getall/:userId",
@@ -33,10 +34,8 @@ const whitelist = [
   "http://localhost",
 ];
 const corsOptions = {
-  credentials: true, // This is important.
+  credentials: true,
   origin: (origin, callback) => {
-    console.log(`origin: ${origin}`);
-    console.log("ran");
     if (whitelist.includes(origin)) return callback(null, true);
     callback(new Error("Not allowed by CORS"));
   },
